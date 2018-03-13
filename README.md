@@ -1,7 +1,7 @@
 # Full Stack 
 
-This architecture utilises Beat modules for data sources, populating a wide range of dashboards to provide a simple experience for new users to the Elastic Stack.
- 
+This architecture utilises Beat modules for data sources.
+
 ## Pre-requisites
 
 1. Current Version of Docker 
@@ -76,37 +76,13 @@ The following Beats modules are utilised in this stack example to provide data a
 
 ## Step by Step Instructions - Deploying the Stack
 
-1. git clone 
+1. git clone https://github.com/chowden/fullstack-security.git
 
-1. Confirm the containers are available, by issuing the following command:
-    
-    ```shell
-    docker ps -a
-    ```
+1. make sure you're in the folder with the docker-compose.yml file 
 
-    this will return a response such as the following:
+## Dashboards with data TODO 
 
-    ```shell
-    CONTAINER ID        IMAGE                                                 COMMAND                  CREATED             STATUS                     PORTS                                          NAMES
-    618c9f2e7a5c        docker.elastic.co/beats/filebeat:5.5.1                "filebeat -e -E ou..."   4 minutes ago       Up 4 minutes                                                              filebeat
-    d35f1b864980        docker.elastic.co/beats/packetbeat:5.5.1              "packetbeat -e -E ..."   4 minutes ago       Up 4 minutes                                                              packetbeat
-    8a569ed62837        docker.elastic.co/beats/heartbeat:5.5.1               "heartbeat -e -E o..."   4 minutes ago       Up 4 minutes                                                              heartbeat
-    076e40495ef8        docker.elastic.co/beats/metricbeat:5.5.1              "metricbeat -e -E ..."   4 minutes ago       Up 4 minutes                                                              metricbeat
-    946a5034e37a        docker.elastic.co/beats/metricbeat:5.5.1              "/bin/bash -c 'cat..."   5 minutes ago       Exited (0) 4 minutes ago                                                  configure_stack
-    c6173ed51209        docker.elastic.co/kibana/kibana:5.5.1                 "/bin/sh -c /usr/l..."   5 minutes ago       Up 5 minutes (healthy)     127.0.0.1:5601->5601/tcp                       kibana
-    7ee2b178416e        fullstackexample_nginx                                "nginx -g 'daemon ..."   5 minutes ago       Up 5 minutes (healthy)     127.0.0.1:80->80/tcp, 443/tcp                  nginx
-    6ebdd87fccd8        fullstackexample_mysql                                "docker-entrypoint..."   5 minutes ago       Up 5 minutes (healthy)     127.0.0.1:3306->3306/tcp                       mqsql
-    198afa6b6325        docker.elastic.co/elasticsearch/elasticsearch:5.5.1   "/bin/bash bin/es-..."   5 minutes ago       Up 5 minutes (healthy)     127.0.0.1:9200->9200/tcp, 9300/tcp             elasticsearch
-    2c61e37a554b        fullstackexample_apache2                              "httpd-foreground"       5 minutes ago       Up 5 minutes (healthy)     127.0.0.1:8000->80/tcp                         apache2`
-    ```
-    
-    Whilst the container ids will be unique, other details should be similar. Note the `configure_stack` container will have exited on completion of the configuration of stack.  This occurs before the beat containers start.  Other containers should be "Up".
-
-1. Kibana is at http://localhost:5601.  
-
-## Dashboards with data
-
-The following dashboards will be accessible and populated.
+The following dashboards will ultimately be accessible and populated.
 
 * CPU/Memory per container
 * DNS
@@ -137,7 +113,7 @@ The majority of the dashboards will simply populate due to inherent “noise” 
 
 * MySQL - port 3306 is exposed allowing the user to connect. Any subsequent Mysql traffic will in turn be visible in the dashboards “Filebeat MySQL Dashboard”, “Metricbeat MySQL” and “Packetbeat MySQL performance”.
 * Nginx - port 80. Currently we don’t host any content in Nginx so requests will result in 404s.  However, content can easily be added as described here.
-* Apache2 - port 8000. Other than the default Apache2 “It works” pages the stack doesn’t host any content.  Again easily changed. 
+* Apache2 - port 8000.  
 * Docker Logs - Any activity to the docker containers, including requests to Kibana, are logged.  These logs are captured in JSON form and indexed into a index “docker-logs-<yyyy.mm.dd>”.
 
 ## Customising the Stack
@@ -145,7 +121,7 @@ The majority of the dashboards will simply populate due to inherent “noise” 
 With respect to the current example, we have provided a few simple entry points for customisation:
 
 1. The example includes an .env file listing environment variables which alter the behaviour of the stack.  These environment variables allow the user to change:
-    * `ELASTIC_VERSION` - the Elastic Stack version (default 5.5.1) 
+    * `ELASTIC_VERSION` - the Elastic Stack version (currently 6.2.2) 
     * `ES_PASSWORD` - the password used for authentication with the elastic user. This password is applied for all system users i.e. kibana and logstash_system. Defaults to “changeme”.
     * `MYSQL_ROOT_PASSWORD` - the password used for the root mysql user. Defaults to “changeme”.
     * `DEFAULT_INDEX_PATTERN` - The index pattern used as the default in Kibana. Defaults to “metricbeat-*”.
@@ -162,3 +138,10 @@ With respect to the current example, we have provided a few simple entry points 
 ```shell
 docker-compose down 
 ```
+
+## Disclaimer and Acknowledgements
+It is an ongoing project, forked and updated from https://www.elastic.co/blog/a-full-stack-in-one-command. It's been updated to work with 6.2.2
+
+Some of it may or may not work
+
+Authenication to Elastic and Kibana certainly doesn't and I'm not sure I can bothered to fix it as it's certainly not for production.
