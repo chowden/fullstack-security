@@ -33,7 +33,7 @@ The following containers are deployed:
 * `Nginx` - Supporting container for Filebeat (access+error logs) and Metricbeat (server-status)
 * `Apache2` - Supporting container for Filebeat (access+error logs) and Metricbeat (server-status)
 * `Mysql` - Supporting container for Filebeat (slow+error logs), Metricbeat (status) and Packetbeat data.
-* `Snort` - TODO - Intent here is to capture malicious traffic (and ultimately simulate it).
+* `Snort` - TODO - Intent here is to capture malicious traffic (and ultimately simulate it), exposing the container to the host OS.
 
 In addition to the above containers, a `configure_stack` container is deployed at startup.  This is responsible for:
 
@@ -144,4 +144,4 @@ It is an ongoing project, forked and updated from https://www.elastic.co/blog/a-
 
 Some of it may or may not work
 
-Authenication to Elastic and Kibana certainly doesn't and I'm not sure I can bothered to fix it as it's certainly not for production.
+Authenication to Elastic and Kibana certainly doesn't. I'm not sure I can bothered to fix it as it's certainly not for production.
