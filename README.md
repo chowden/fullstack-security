@@ -1,6 +1,5 @@
-# Full Stack Example
+# Full Stack 
 
-This example complements the blog post ["A full stack in one command"](TODO), providing the docker compose files responsible for deploying an example architecture of the Elastic Stack.  
 This architecture utilises Beat modules for data sources, populating a wide range of dashboards to provide a simple experience for new users to the Elastic Stack.
  
 ## Pre-requisites
@@ -16,15 +15,10 @@ This architecture utilises Beat modules for data sources, populating a wide rang
     - `3306` (Mysql)
     
 1. Atleast 4Gb of available RAM
-1. wget - This is not a native tool on windows but readily available e.g. through [chocolatey](https://chocolatey.org/packages/Wget)
-1. If using a version of Docker for Windows that utilises a VM e.g. docker toolbox, ensure the [Windows Loopback adapter](https://technet.microsoft.com/en-gb/library/cc708322(v=ws.10).aspx) is installed.
-
-The example file uses docker-compose v2 syntax.
-
 
 ## Versions
 
-All Elastic Stack components are version 6.3.3
+All Elastic Stack components are version 6.2.2. THis can be changed in the environment file (see at the bottom)
 
 ## Architecture 
 
@@ -39,6 +33,7 @@ The following containers are deployed:
 * `Nginx` - Supporting container for Filebeat (access+error logs) and Metricbeat (server-status)
 * `Apache2` - Supporting container for Filebeat (access+error logs) and Metricbeat (server-status)
 * `Mysql` - Supporting container for Filebeat (slow+error logs), Metricbeat (status) and Packetbeat data.
+* `Snort` - TODO - Intent here is to capture malicious traffic (and ultimately simulate it).
 
 In addition to the above containers, a `configure_stack` container is deployed at startup.  This is responsible for:
 
@@ -48,7 +43,7 @@ In addition to the above containers, a `configure_stack` container is deployed a
 
 This container uses the Metricbeat images as it contains the required dashboards.
 
-## Modules & Data
+## Modules & Data TODO
 
 The following Beats modules are utilised in this stack example to provide data and dashboards:
 
@@ -58,6 +53,8 @@ The following Beats modules are utilised in this stack example to provide data a
     - `icmp`
     - `flows`
     - `mysql` - port `3306`
+    
+    NOTE: THIS WILL HAMMER ELASTICSEARCH, SO YOU MAY BE BETTER ADVISED TO REDUCE THE TRAFFIC CAPTURE DOWN TO SOMETHING MORE REALISTIC AND SAVE YOUR CPU.
     
 1. Metricbeat
     - `apache` module with `status` metricset
@@ -79,7 +76,7 @@ The following Beats modules are utilised in this stack example to provide data a
 
 ## Step by Step Instructions - Deploying the Stack
 
-1. TOD    
+1. git clone 
 
 1. Confirm the containers are available, by issuing the following command:
     
@@ -105,11 +102,7 @@ The following Beats modules are utilised in this stack example to provide data a
     
     Whilst the container ids will be unique, other details should be similar. Note the `configure_stack` container will have exited on completion of the configuration of stack.  This occurs before the beat containers start.  Other containers should be "Up".
 
-1. On confirming the stack is started, navigate to kibana at http://localhost:5601.  Assuming you haven't changed the default password, see [Customising the Stack](TODO), the default credentials of `elastic` and `changeme` should apply.
-
-1. Navigate to the dashboard view. Open any of the dashboards listed as having data below. The following shows the Metricbeat-Docker dashboard.
-
-![Metricbeat Docker Dashboard](https://user-images.githubusercontent.com/12695796/29227415-a3413aec-7ecd-11e7-8824-cfc48982b124.png)
+1. Kibana is at http://localhost:5601.  
 
 ## Dashboards with data
 
@@ -137,26 +130,6 @@ The following dashboards will be accessible and populated.
 * Packetbeat Flows
 * Packetbeat HTTP
 * Packetbeat MySQL performance
-
-## Technical notes
-
-The following summarises some important technical considerations:
-
-1. Environment variable defaults can be found in the file .env`
-1. The Elasticsearch container has its memory limited to 4g. This can be adjusted using the environment parameter `ES_MEM_LIMIT`. Elasticsearch has a heap size of 1g. This can be adjusted through the environment variable `ES_JVM_HEAP` and should be set to 50% of the `ES_MEM_LIMIT`.  **Users may wish to adjust this value on smaller machines**.
-1. The Elasticsearch password can be set via the environment variable `ES_PASSWORD`. This sets the password for the `elastic`, `logstash_system` and `kibana` user.
-1. The Kibana container exposes the port 5601.
-1. All configuration files can be found in the folder `config`.
-1. In order for the containers `nginx`, `apache2` and `mysql` to share their logs with the Filebeat container, they mount the folder `./logs` relative to the extracted directory. Filebeat additionally mounts this directory to read the logs.
-1. The Filebeat container mounts the host directories `/private/var/log` (osx) and `/var/log` (linux) in order to read the host's system logs. **This feature is not available in Windows**
-1. The Filebeat container mounts the host directory `/var/lib/docker/containers` in order to access the container logs.  These are ingested using a custom [prospector](TODO) and processed by an ingest pipeline loaded by the container `configure_stack`.
-1. The Filebeat registry file is persisted to the named volume `fbdata`, thus avoiding data duplication during restarts
-1. In order to collect docker statistics, Metricbeat mounts the hosts `/var/run/docker.sock` directory.  For windows and osx, this directory exists on the VM hosting docker.
-1. Packetbeat is configured to use the hosts network, in order to capture traffic on the host system rather than that between the containers.
-1. The nginx, msql and apache containers expose ports 80, 8000 and 3306 respectively on the host. **Ensure these ports are free prior to starting**
-1. The Metricbeat container mounts both `/proc` and `/sys/fs/cgroup` on linux.  This allows Metricbeat to use the `system` module report on disk, memory, network and cpu of the host.  **This is only performed on linux.  For windows and osx the stats of the VM hosting docker will be reported.  The module detects virtual disks will be result in confusing statistics.  This is pending improvement**
-1. In for Filebeat to index the docker logs it mounts `/var/lib/docker/containers`. These JSON logs are ingested into the index `docker-logs-<yyyy-MM-dd>`
-1. On systems with POSIX file permissions, all Beats configuration files are subject to ownership and file permission checks. The purpose of these checks is to prevent unauthorized users from providing or modifying configurations that are run by the Beat.  The owner of the configuration file must be either root or the user who is executing the Beat process. The permissions on the file must disallow writes by anyone other than the owner.  As we mount our configurations from the host, where the user is likely different than that used to run the container and the beat process, we disable this check for all beats with  -strict.perms=false.
 
 ## Generating data
 
@@ -187,5 +160,5 @@ With respect to the current example, we have provided a few simple entry points 
 ## Shutting down the stack
 
 ```shell
-docker-compose -f docker-compose.yml down -v
-
+docker-compose down 
+```
