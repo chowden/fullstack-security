@@ -4,9 +4,10 @@ This architecture utilises Beat modules for data sources.
 
 ## Pre-requisites
 
-1. Current Version of Docker 
-1. Docker-Compose 
-1. Ensuring the following ports are free on the host, as they are mounted by the containers:
+1. Current Version of Docker (tested with
+1. Docker-Compose (tested with 
+1. Docker-Engine (tested with 
+1. The following ports free on the host, as they are exposed:
 
     - `80` (Nginx)
     - `8000` (Apache2)
@@ -14,11 +15,11 @@ This architecture utilises Beat modules for data sources.
     - `9200` (Elasticsearch)
     - `3306` (Mysql)
     
-1. Atleast 4Gb of available RAM
+1. At least 8Gb of available RAM
 
 ## Versions
 
-All Elastic Stack components are version 6.2.2. THis can be changed in the environment file (see at the bottom)
+All Elastic Stack components are tested and working at version 6.2.2. THis can be changed in the environment file (see at the bottom)
 
 ## Architecture 
 
